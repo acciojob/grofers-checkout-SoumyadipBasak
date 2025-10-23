@@ -23,9 +23,13 @@
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
+        /* Make price cells editable so we can test the update logic */
         .price {
-            /* Make price cells editable so we can test the update logic */
-            contenteditable: true; 
+            /* Editable cell look and feel */
+            outline: none;
+        }
+        .price[contenteditable="true"]:focus {
+            background-color: #eaf3ff;
         }
         .total-row td {
             font-weight: bold;
@@ -46,23 +50,23 @@
         <tbody>
             <tr>
                 <td class="item">Tea</td>
-                <td class="price">50</td>
+                <td class="price" contenteditable="true">50</td>
             </tr>
             <tr>
                 <td class="item">Coffee</td>
-                <td class="price">70</td>
+                <td class="price" contenteditable="true">70</td>
             </tr>
             <tr>
                 <td class="item">Biscuits</td>
-                <td class="price">100</td>
+                <td class="price" contenteditable="true">100</td>
             </tr>
             <tr>
                 <td class="item">Rice</td>
-                <td class="price">130</td>
+                <td class="price" contenteditable="true">130</td>
             </tr>
             <tr>
                 <td class="item">Milk</td>
-                <td class="price">50</td>
+                <td class="price" contenteditable="true">50</td>
             </tr>
         </tbody>
     </table>
@@ -70,8 +74,7 @@
     <script type="text/javascript">
         // Function to compute total price from table rows
         function computeTotal() {
-            // NOTE: Using '.price' based on HTML. If HTML used 'class="prices"' as per Note, 
-            // the selector should be document.querySelectorAll('#grofersTable .prices');
+            // Select all price cells inside the Grofers table
             const priceCells = document.querySelectorAll('#grofersTable .price');
             let total = 0;
 
