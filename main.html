@@ -1,121 +1,131 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Grofers Checkout</title>
-  <style>
-    /* Optional styling for readability */
-    table {
-      border-collapse: collapse;
-      width: 60%;
-      margin: 20px auto;
-    }
-    caption {
-      caption-side: top;
-      font-weight: bold;
-      margin-bottom: 8px;
-    }
-    th, td {
-      border: 1px solid #ddd;
-      padding: 8px 12px;
-      text-align: left;
-    }
-    tr:nth-child(even) {
-      background-color: #f9f9f9;
-    }
-    .total-row td {
-      font-weight: bold;
-      background-color: #e8f0ff;
-    }
-  </style>
+    <meta charset="UTF-8" />
+    <title>Grofers Checkout</title>
+    <style>
+        /* Optional styling for readability */
+        table {
+            border-collapse: collapse;
+            width: 60%;
+            margin: 20px auto;
+        }
+        caption {
+            caption-side: top;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px 12px;
+            text-align: left;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        .price {
+            /* Make price cells editable so we can test the update logic */
+            contenteditable: true; 
+        }
+        .total-row td {
+            font-weight: bold;
+            background-color: #e8f0ff;
+            text-align: right !important; /* Force right alignment for total */
+        }
+    </style>
 </head>
 <body>
-  <table id="grofersTable" style="width: 100%">
-    <caption>Monthly savings</caption>
-    <thead>
-      <tr>
-        <th>Item</th>
-        <th>Prices in Rs</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td class="item">Tea</td>
-        <td class="price">50</td>
-      </tr>
-      <tr>
-        <td class="item">Coffee</td>
-        <td class="price">70</td>
-      </tr>
-      <tr>
-        <td class="item">Biscuits</td>
-        <td class="price">100</td>
-      </tr>
-      <tr>
-        <td class="item">Rice</td>
-        <td class="price">130</td>
-      </tr>
-      <tr>
-        <td class="item">Milk</td>
-        <td class="price">50</td>
-      </tr>
-    </tbody>
-  </table>
+    <table id="grofersTable" style="width: 100%">
+        <caption>Monthly savings</caption>
+        <thead>
+            <tr>
+                <th>Item</th>
+                <th>Prices in Rs</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td class="item">Tea</td>
+                <td class="price">50</td>
+            </tr>
+            <tr>
+                <td class="item">Coffee</td>
+                <td class="price">70</td>
+            </tr>
+            <tr>
+                <td class="item">Biscuits</td>
+                <td class="price">100</td>
+            </tr>
+            <tr>
+                <td class="item">Rice</td>
+                <td class="price">130</td>
+            </tr>
+            <tr>
+                <td class="item">Milk</td>
+                <td class="price">50</td>
+            </tr>
+        </tbody>
+    </table>
 
-  <script type="text/javascript">
-    // Function to compute total price from table rows
-    function computeTotal() {
-      // Use querySelectorAll to collect all price cells with class "price"
-      const priceCells = document.querySelectorAll('#grofersTable .price');
-      let total = 0;
+    <script type="text/javascript">
+        // Function to compute total price from table rows
+        function computeTotal() {
+            // NOTE: Using '.price' based on HTML. If HTML used 'class="prices"' as per Note, 
+            // the selector should be document.querySelectorAll('#grofersTable .prices');
+            const priceCells = document.querySelectorAll('#grofersTable .price');
+            let total = 0;
 
-      priceCells.forEach(cell => {
-        // Parse the text content as a number (trim spaces just in case)
-        const value = parseFloat(cell.textContent.trim());
-        if (!isNaN(value)) {
-          total += value;
+            priceCells.forEach(cell => {
+                // Parse the text content as a number (trim spaces just in case)
+                const value = parseFloat(cell.textContent.trim());
+                if (!isNaN(value)) {
+                    total += value;
+                }
+            });
+
+            return total;
         }
-      });
 
-      return total;
-    }
+        // Function to render the total in a new row at the end of the tbody
+        function renderTotalRow(total) {
+            const table = document.getElementById('grofersTable');
+            const tBody = table.querySelector('tbody');
+            
+            // 1. Remove existing total row if present to avoid duplicates
+            const existingTotalRow = table.querySelector('tr.total-row');
+            if (existingTotalRow) {
+                existingTotalRow.remove();
+            }
 
-    // Function to render the total in a new row at the end of the tbody
-    function renderTotalRow(total) {
-      const table = document.getElementById('grofersTable');
-      // Remove existing total row if present to avoid duplicates
-      const existingTotalRow = table.querySelector('tr.total-row');
-      if (existingTotalRow) {
-        existingTotalRow.remove();
-      }
+            // 2. Create the new row (<tr>)
+            const totalRow = document.createElement('tr');
+            totalRow.className = 'total-row';
+            
+            // 3. Create the single cell (<td>)
+            const totalCell = document.createElement('td');
+            
+            // 4. Set the text and make it span both columns
+            totalCell.colSpan = 2; // span across both 'Item' and 'Prices in Rs' columns
+            totalCell.textContent = 'Total Price: Rs ' + total.toFixed(2);
 
-      // Create a new row with a single cell spanning two columns
-      const tBody = table.querySelector('tbody');
-      const totalRow = document.createElement('tr');
-      totalRow.className = 'total-row';
-      const totalCell = document.createElement('td');
-      totalCell.colSpan = 2; // span across both columns
-      totalCell.style.textAlign = 'right';
-      totalCell.textContent = 'Total: Rs ' + total.toFixed(2);
+            // 5. Append the cell to the row, and the row to the table body
+            totalRow.appendChild(totalCell);
+            tBody.appendChild(totalRow);
+        }
 
-      totalRow.appendChild(totalCell);
-      tBody.appendChild(totalRow);
-    }
+        // Run the logic initially on page load
+        const initialTotal = computeTotal();
+        renderTotalRow(initialTotal);
 
-    // Initial computation and rendering
-    const total = computeTotal();
-    renderTotalRow(total);
-
-    // Optional: If prices can be edited by the user, re-run after edits.
-    // For example, listen to changes in the table and update total accordingly:
-    const table = document.getElementById('grofersTable');
-    table.addEventListener('input', function(event) {
-      // Only respond if the edited element is a price cell
-      if (event.target && event.target.classList.contains('price')) {
-        const newTotal = computeTotal();
-        renderTotalRow(newTotal);
-      }
-    });
-  </script>
+        // Add a listener to handle dynamic updates if prices are changed
+        const table = document.getElementById('grofersTable');
+        table.addEventListener('input', function(event) {
+            // Only respond if the edited element has the class 'price'
+            if (event.target && event.target.classList.contains('price')) {
+                const newTotal = computeTotal();
+                renderTotalRow(newTotal);
+            }
+        });
+    </script>
 </body>
 </html>
