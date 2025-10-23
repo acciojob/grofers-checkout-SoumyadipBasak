@@ -1,16 +1,16 @@
+// 1. Create and append the "Get Total Price" button
 const getSumBtn = document.createElement("button");
 getSumBtn.append("Get Total Price");
 document.body.appendChild(getSumBtn);
 
 const getSum = () => {
-    // Select all elements with the class 'price' (which holds the price values)
+    // 2. Select all price elements using the correct class name from the HTML
     const priceElements = document.querySelectorAll('.price');
     
     let totalPrice = 0;
     
-    // Iterate and sum the prices
+    // 3. Loop through the elements, convert text to a number, and sum
     priceElements.forEach(priceCell => {
-        // Convert the text content to an integer and add it to the total
         const price = parseInt(priceCell.textContent.trim());
         
         if (!isNaN(price)) {
@@ -18,36 +18,37 @@ const getSum = () => {
         }
     });
 
-    // Find the table element
+    // 4. Find the table element
     const table = document.querySelector('table');
     
-    // Remove any existing total row to prevent duplicates upon multiple clicks
+    // 5. Check and remove any existing total row to prevent duplicates
     let existingTotalRow = document.getElementById('total-row');
     if (existingTotalRow) {
         existingTotalRow.remove();
     }
 
-    // Create the new table row (<tr>)
+    // 6. Create the new row (<tr>)
     const totalRow = document.createElement('tr');
-    totalRow.id = 'total-row'; 
+    totalRow.id = 'total-row'; // Use an ID to easily target it later
 
-    // Create a single table data cell (<td>)
+    // 7. Create the total cell (<td>)
     const totalCell = document.createElement('td');
     
     // Set the content
     totalCell.textContent = `Total Price: Rs ${totalPrice}`;
     
-    // Make the cell span both columns ('Item' and 'Prices in Rs')
+    // 8. Crucial step: Make the cell span both columns
     totalCell.setAttribute('colspan', '2'); 
     
-    // Optional styling for clarity
+    // Optional: Add basic styling for visibility
     totalCell.style.fontWeight = 'bold';
     totalCell.style.textAlign = 'center';
-    totalCell.style.backgroundColor = '#f0f0f0'; 
+    totalCell.style.backgroundColor = '#dff0d8'; // Light green background
 
-    // Append the cell to the row and the row to the table
+    // 9. Append the cell to the row, and the row to the table
     totalRow.appendChild(totalCell);
     table.appendChild(totalRow);
 };
 
+// 10. Attach the function to the button click event
 getSumBtn.addEventListener("click", getSum);
