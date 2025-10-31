@@ -4,46 +4,57 @@
     <meta charset="UTF-8" />
     <title>Grofers Checkout</title>
     <style>
-        /* Optional styling for readability */
+        /* 🎨 CSS Styling for the table */
         table {
             border-collapse: collapse;
             width: 60%;
             margin: 20px auto;
+            font-family: Arial, sans-serif;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
         }
         caption {
             caption-side: top;
             font-weight: bold;
-            margin-bottom: 8px;
+            font-size: 1.2em;
+            margin-bottom: 10px;
         }
         th, td {
             border: 1px solid #ddd;
-            padding: 8px 12px;
+            padding: 10px 15px;
             text-align: left;
+        }
+        thead th {
+            background-color: #4CAF50;
+            color: white;
         }
         tr:nth-child(even) {
             background-color: #f9f9f9;
         }
-        /* Make price cells editable so we can test the update logic */
+        /* Price cell styling */
         .price {
-            /* Editable cell look and feel */
-            outline: none;
-            /* Ensure the price column is right-aligned for currency look */
-            text-align: right; 
+            text-align: right; /* Align numbers to the right */
+            cursor: pointer;
+            transition: background-color 0.2s;
         }
+        /* Style for editable cells when focused */
         .price[contenteditable="true"]:focus {
             background-color: #eaf3ff;
+            outline: 2px solid #2196F3;
         }
-        /* Style for the new total row */
+        /* 💰 Style for the new total row */
         .total-row td {
             font-weight: bold;
-            background-color: #e8f0ff;
-            text-align: right !important; /* Force right alignment for total */
+            background-color: #007bff; /* Blue background for total */
+            color: white;
+            text-align: right !important; /* Ensure right alignment for total */
+            font-size: 1.1em;
+            padding: 12px 15px;
         }
     </style>
 </head>
 <body>
-    <table id="grofersTable" style="width: 100%">
-        <caption>Monthly savings</caption>
+    <table id="grofersTable" style="width: 80%">
+        <caption>🛒 Grocery Checkout List</caption>
         <thead>
             <tr>
                 <th>Item</th>
@@ -76,20 +87,19 @@
 
     <script type="text/javascript">
         /**
-         * 🛒 Calculates the sum of all prices in the table by selecting elements with class "price".
-         * This function is designed to be reusable and works regardless of price changes or list length.
+         * 🔢 Calculates the sum of all prices in the table by selecting elements with class "price".
          * @returns {number} The computed total price.
          */
         function computeTotal() {
-            // Use querySelectorAll to collect all price cells within the table body
+            // Select all table data cells with the class "price" inside the table body
             const priceCells = document.querySelectorAll('#grofersTable tbody .price');
             let total = 0;
 
             priceCells.forEach(cell => {
-                // Parse the text content as a floating-point number
+                // Get the text content, remove whitespace, and convert to a number
                 const value = parseFloat(cell.textContent.trim());
                 
-                // Add to total only if the value is a valid number
+                // Add to total only if the result is a valid number
                 if (!isNaN(value)) {
                     total += value;
                 }
@@ -100,22 +110,22 @@
 
         /**
          * 📝 Renders or updates the calculated total as a new row in the table.
-         * It first removes any existing total row to ensure it's not duplicated.
+         * It handles the creation and placement of the "Total Price" row.
          * @param {number} total The total price to display.
          */
         function renderTotalRow(total) {
             const table = document.getElementById('grofersTable');
             const tBody = table.querySelector('tbody');
             
-            // 1. Remove existing total row (tr.total-row) if present
+            // 1. Remove existing total row (tr.total-row) if present to prevent duplication
             const existingTotalRow = table.querySelector('tr.total-row');
             if (existingTotalRow) {
                 existingTotalRow.remove();
             }
 
-            // 2. Create the new table row (<tr>) for the total
+            // 2. Create the new table row (<tr>)
             const totalRow = document.createElement('tr');
-            totalRow.className = 'total-row'; // Use the class for styling
+            totalRow.className = 'total-row';
 
             // 3. Create the single table data cell (<td>)
             const totalCell = document.createElement('td');
@@ -123,8 +133,8 @@
             // 4. Set the cell to span both columns ('Item' and 'Prices in Rs')
             totalCell.colSpan = 2; 
             
-            // 5. Set the text content: "Total Price: Rs X.XX"
-            totalCell.textContent = 'Total Price: Rs ' + total.toFixed(2); // Use toFixed(2) for currency format
+            // 5. Set the text content, formatting to two decimal places
+            totalCell.textContent = 'Total Price: Rs ' + total.toFixed(2);
 
             // 6. Append the cell to the row, and the row to the table body
             totalRow.appendChild(totalCell);
@@ -133,18 +143,17 @@
 
         // --- Execution Logic ---
 
-        // 1. Initial computation and rendering when the page loads
+        // 1. Compute and render the total when the page first loads
         const initialTotal = computeTotal();
         renderTotalRow(initialTotal);
 
-        // 2. Event listener for dynamic updates. 
-        // Attach the listener to the table and listen for the 'input' event, 
-        // which fires when the content of an editable element changes.
+        // 2. Attach an event listener to the table for dynamic updates.
+        // The 'input' event is triggered whenever the content of an editable cell changes.
         const table = document.getElementById('grofersTable');
         table.addEventListener('input', function(event) {
-            // Check if the event originated from a price cell (with class 'price')
+            // Check if the element that triggered the event is a price cell
             if (event.target && event.target.classList.contains('price')) {
-                // Recompute and re-render the total
+                // Recompute and re-render the total immediately
                 const newTotal = computeTotal();
                 renderTotalRow(newTotal);
             }
